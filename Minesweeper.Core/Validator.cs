@@ -1,23 +1,22 @@
-﻿using Minesweeper.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿using Minesweeper.Contracts;
+using Minesweeper.Model;
 namespace Minesweeper.Core
 {
-    public class Validator
+    /// <summary>
+    /// Validator class provides methods to validate the user action on a board more specifically on a block.
+    /// </summary>
+    public class Validator  : IValidator
     {
-        private Board _board;
-        public Validator(Board board)
+        /// <summary>
+        /// ValidateAction method will validate the user action on a block.
+        /// </summary>
+        /// <param name="board">Board object which holds all the blocks.</param>
+        /// <param name="position">Position of the block on which user performs an action.</param>
+        /// <param name="action">Type of the action which user intends to perform on a block.</param>
+        /// <returns></returns>
+        public bool ValidateAction(Board board, Point position, BlockAction action)
         {
-            _board = board;
-        }
-
-        public bool ValidateAction(Point position, BlockAction action)
-        {
-            var block = IsValidIndex(position);
+            var block = IsValidIndex(board, position);
             if (block == null)
                 return false;
 
@@ -27,9 +26,9 @@ namespace Minesweeper.Core
             return true;
         }
 
-        private Block IsValidIndex(Point position)
+        private Block IsValidIndex(Board board, Point position)
         {
-            var result = _board.IndexOf(position.X, position.Y);
+            var result = board.IndexOf(position.X, position.Y);
             return result;
         }
     }

@@ -1,16 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-
 namespace Minesweeper.Model
 {
+    /// <summary>
+    /// Board class represents a board of blocks.
+    /// </summary>
     public class Board
     {
         private int _height;
         private int _width;
         private List<Block> _blocks;
+        /// <summary>
+        /// Board class constructor which initiates a board with given height, width and difficulty,
+        /// </summary>
+        /// <param name="height">Height of the board</param>
+        /// <param name="width">Width of the board</param>
+        /// <param name="level">Difficulty level of the board</param>
         public Board(int height, int width, Difficulty level)
         {
             _height = height;
@@ -19,6 +25,9 @@ namespace Minesweeper.Model
             Construct();
         }
 
+        /// <summary>
+        /// Height of the board.
+        /// </summary>
         public int Height
         {
             get
@@ -27,6 +36,9 @@ namespace Minesweeper.Model
             }
         }
 
+        /// <summary>
+        /// Width of the board.
+        /// </summary>
         public int Width
         {
             get
@@ -35,6 +47,9 @@ namespace Minesweeper.Model
             }
         }
 
+        /// <summary>
+        /// Flattened structure of blocks in a board.
+        /// </summary>
         public List<Block> FlattenBlocks
         {
             get
@@ -46,22 +61,44 @@ namespace Minesweeper.Model
             }
         }
 
+        /// <summary>
+        /// Two dimensional array of the blocks in a board.
+        /// </summary>
         public Block[,] Blocks { get; set; }
+
+        /// <summary>
+        /// Difficulty level of the board.
+        /// </summary>
         public Difficulty Level { get; set; }
 
+        /// <summary>
+        /// IndexOf method retrieves a block from the given index position.
+        /// </summary>
+        /// <param name="x">X coordinate of the block</param>
+        /// <param name="y">Y coordinate of the block</param>
+        /// <returns>Block object</returns>
         public Block IndexOf(int x, int y)
         {
             return this.FlattenBlocks.FirstOrDefault(p => p.Position.X == x && p.Position.Y == y);
         }
 
-        public void OpenAll()
+        /// <summary>
+        /// OpenAll method opens all pending mines blocks in the board.
+        /// </summary>
+        public void OpenAllPendingMines()
         {
             this.FlattenBlocks.ForEach(p =>
             {
-                p.BlockState = BlockState.Opened;
+                if(p.BlockType == BlockType.Mine && (p.BlockState == BlockState.Flagged || p.BlockState == BlockState.Unopened))
+                    p.BlockState = BlockState.Opened;
             });
         }
 
+        /// <summary>
+        /// The ToString method overrides the default behaviour and represents the board as a cummulative strnig of blocks,
+        /// where every block is represented with .|?|X based on the block's type and state.
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             var boardString = new StringBuilder();

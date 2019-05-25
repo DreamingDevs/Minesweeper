@@ -2,10 +2,10 @@
 using Minesweeper.Core;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Text.RegularExpressions;
+using Unity;
+using Minesweeper.Contracts;
+using Minesweeper.Core.Handlers;
 
 namespace Minesweeper
 {
@@ -22,7 +22,7 @@ namespace Minesweeper
             Console.Write("Enter Difficulty (low = 1, medium = 2, high = 3) : ");
             var inputLevel = Console.ReadLine();
             Difficulty level;
-            switch(inputLevel)
+            switch (inputLevel)
             {
                 case "1":
                     level = Difficulty.Low;
@@ -38,21 +38,31 @@ namespace Minesweeper
                     break;
             }
 
-            CreateGameAndPlay(height, width, level);
+            var container = ConfigureContainer();
+            var game = container.Resolve<IGame>();
+            ConfigureGameAndPlay(game, height, width, level);
 
             Console.ReadLine();
         }
 
-        private static void CreateGameAndPlay(int height, int width, Difficulty level)
+        /// <summary>
+        /// ConfigureGameAndPlay method configures the game instance with user inputs - Height, Width and difficulty levels. 
+        /// It initiates, starts and plays the game until it is finished. 
+        /// </summary>
+        /// <param name="game">Game instance which is configured at the unity container.</param>
+        /// <param name="height">Height of the board.</param>
+        /// <param name="width">Width of the board.</param>
+        /// <param name="level">Difficult level of the board.</param>
+        private static void ConfigureGameAndPlay(IGame game, int height, int width, Difficulty level)
         {
-            var game = new Game(height, width, level);
+            game.CreateBoard(height, width, level);
             Print(game);
 
             while (!game.IsCompleted)
             {
                 Console.Write("Enter your selection in f(x,y) | o(x,y) format. (f|o) => (flag|open) : ");
                 var selection = Console.ReadLine();
-                var formattedInput = TryParseValidate(selection);
+                var formattedInput = TryParseValidateInput(selection);
 
                 if (!formattedInput.Item1)
                 {
@@ -66,13 +76,19 @@ namespace Minesweeper
 
                 Print(game);
             }
+            Console.WriteLine("Game is over!!!");
         }
 
-        private static Tuple<bool, int, int, BlockAction> TryParseValidate(string input)
+        /// <summary>
+        /// TryParseValidateInput method is used to parse and validate the user input which is captured from the console.
+        /// </summary>
+        /// <param name="input">Raw input from the console.</param>
+        /// <returns>A tuple of True|False defining the validation process, X, Y Coordinates of the block and BlockAction which user wants to perform.</returns>
+        private static Tuple<bool, int, int, BlockAction> TryParseValidateInput(string input)
         {
             var regex = new Regex(@"^(f|o)\((\d),(\d)\)$");
             var match = regex.Match(input);
-            if(!match.Success)
+            if (!match.Success)
                 return new Tuple<bool, int, int, BlockAction>(false, 0, 0, BlockAction.Open);
 
             var inputArr = new string[3];
@@ -83,7 +99,7 @@ namespace Minesweeper
             var selectedAction = inputArr[0] == "o" ? BlockAction.Open : BlockAction.Flag;
 
             int selectedX;
-            if(!int.TryParse(inputArr[1], out selectedX))
+            if (!int.TryParse(inputArr[1], out selectedX))
                 return new Tuple<bool, int, int, BlockAction>(false, 0, 0, BlockAction.Open);
 
             int selectedY;
@@ -93,10 +109,44 @@ namespace Minesweeper
             return new Tuple<bool, int, int, BlockAction>(true, selectedX, selectedY, selectedAction);
         }
 
-        private static void Print(Game game)
+        private static void Print(IGame game)
         {
             Console.WriteLine("Current State : ");
             Console.WriteLine(game.CurrentBoard.ToString());
+        }
+
+        /// <summary>
+        /// ConfigureContainer configures the Unit Container through which all the dependencies are resolved at runtime for 
+        /// the minesweeper game.
+        /// </summary>
+        /// <returns>The container which holds all the resolved types.</returns>
+        private static IUnityContainer ConfigureContainer()
+        {
+            IUnityContainer container = new UnityContainer();
+            container.RegisterType<IRandomMiner, RandomMiner>();
+            container.RegisterType<IValidator, Validator>();
+            container.RegisterType<IGame, Game>();
+            var handlers = LoadHandlers();
+            container.RegisterInstance<IBlockActionHandlers>(handlers);
+
+            return container;
+        }
+
+        /// <summary>
+        /// LoadHandlers method is used to load all the Action handles in to the BlockActionHandlers dictionary.
+        /// </summary>
+        /// <returns>And instanc of IBlockActionHandlers containing all action handlers.</returns>
+        private static IBlockActionHandlers LoadHandlers()
+        {
+            var handlers = new BlockActionHandlers
+            {
+                Handlers = new Dictionary<BlockAction, IActionHandler>()
+                {
+                    { BlockAction.Flag, new FlagActionHandler() },
+                    { BlockAction.Open, new OpenActionHandler() }
+                }
+            };
+            return handlers;
         }
     }
 }

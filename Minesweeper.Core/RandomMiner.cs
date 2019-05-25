@@ -1,15 +1,18 @@
-﻿using Minesweeper.Model;
+﻿using Minesweeper.Contracts;
+using Minesweeper.Model;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Minesweeper.Core
 {
-    public class RandomMiner
+    /// <summary>
+    /// RandomMiner class provides methods to randomize a given board by placing mines at random locations based on the selected difficulty level.
+    /// </summary>
+    public class RandomMiner : IRandomMiner
     {
-        public static void GenerateRandomMines(Board board)
+        /// <summary>
+        /// GenerateRandomMines method generated random mines on a given board.
+        /// </summary>
+        /// <param name="board">Board object which holds all the blocks.</param>
+        public void GenerateRandomMines(Board board)
         {
             var totalRandomPositions = Math.Round((board.Height * board.Width) * ((double)board.Level / 100), 0, MidpointRounding.AwayFromZero);
             var currentMinesCount = 0;

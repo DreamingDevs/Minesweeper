@@ -1,13 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Minesweeper.Model
+﻿namespace Minesweeper.Model
 {
+    /// <summary>
+    /// Point class represents a point based on X and Y coordinates.
+    /// </summary>
     public class Point
     {
+        /// <summary>
+        /// Point class constructor defines the X and Y coordinates of a point.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
         public Point(int x, int y)
         {
             this.X = x;
