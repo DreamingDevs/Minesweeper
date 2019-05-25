@@ -49,11 +49,26 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="UnitTest1.cs" />
+    <Compile Include="GameConfiguration.cs" />
+    <Compile Include="GameTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Minesweeper.Contracts\Minesweeper.Contracts.csproj">
+      <Project>{df9c2a4b-310f-4195-87f1-4876802d4b9c}</Project>
+      <Name>Minesweeper.Contracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Minesweeper.Core\Minesweeper.Core.csproj">
+      <Project>{4e9f8e91-0d04-49cc-9b0f-044ec7e5d659}</Project>
+      <Name>Minesweeper.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Minesweeper.Model\Minesweeper.Model.csproj">
+      <Project>{aeff6d07-7467-4ce8-a99a-8493e0d5ecbb}</Project>
+      <Name>Minesweeper.Model</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
